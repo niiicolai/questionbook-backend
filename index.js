@@ -13,6 +13,7 @@ import GroupUserController from './src/controllers/groupUserController.js';
 import RoleController from './src/controllers/roleController.js';
 import PermissionController from './src/controllers/permissionController.js';
 import RolePermissionController from './src/controllers/rolePermissionController.js';
+import UploadController from './src/controllers/uploadController.js';
 
 const app = express();
 const port = 3001;
@@ -32,6 +33,7 @@ app.use(GroupUserController);
 app.use(RoleController);
 app.use(PermissionController);
 app.use(RolePermissionController);
+app.use(UploadController);
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`)
 });
