@@ -76,4 +76,9 @@ export default class RolePermission extends Model {
 
         return super.update(pk, data);
     }
+
+    async findAllByRoleName(roleName) {
+        const rows = await this.findWhere({ roleName });
+        return rows;
+    }
 }

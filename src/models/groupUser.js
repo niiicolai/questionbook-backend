@@ -90,4 +90,22 @@ export default class GroupUser extends Model {
 
         return super.update(pk, data);
     }
+
+    async findByIdAndUserId(id, userId) {
+        const rows = await this.findWhere({ id, userId });
+        const record = rows[0];
+        return record;
+    }
+
+    async findByGroupIdAndUserId(groupId, userId) {
+        const rows = await this.findWhere({ groupId, userId });
+        const record = rows[0];
+        return record;
+    }
+
+    async findByIdAndGroupIdAndUserId(id, groupId, userId) {
+        const rows = await this.findWhere({ id, groupId, userId });
+        const record = rows[0];
+        return record;
+    }
 }

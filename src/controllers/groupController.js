@@ -6,10 +6,13 @@ import GroupDTO from '../dtos/group.js';
 
 import csrfProtection from '../middleware/csrfProtection.js';
 import jwtProtection from '../middleware/jwtProtection.js';
+import groupProtection from '../middleware/groupProtection.js';
 
 const router = express.Router()
 const service = new EntityService(new Group(), GroupDTO);
-const stateChangeMiddleware = [jwtProtection, csrfProtection]
+const createMiddleware = [jwtProtection, csrfProtection]
+const patchMiddleware = [jwtProtection, csrfProtection, groupProtection('group:update')]
+const deleteMiddleware = [jwtProtection, csrfProtection, groupProtection('group:delete')]
 
 router.route('/api/v1/group/:id')
     .get(async (req, res) => {
@@ -27,7 +30,7 @@ router.route('/api/v1/group/:id')
             res.status(500).json('Internal Server Error');
         }
     })
-    .patch(stateChangeMiddleware, async (req, res) => {
+    .patch(patchMiddleware, async (req, res) => {
         try {
             const { id } = req.params;
             const record = await service.update(id, req.body);
@@ -42,7 +45,7 @@ router.route('/api/v1/group/:id')
             res.status(500).json('Internal Server Error');
         }
     })
-    .delete(stateChangeMiddleware, async (req, res) => {
+    .delete(deleteMiddleware, async (req, res) => {
         try {
             const { id } = req.params;
             await service.delete(id);
@@ -73,7 +76,7 @@ router.route('/api/v1/groups')
             res.status(500).json('Internal Server Error');
         }
     })
-    .post(stateChangeMiddleware, async (req, res) => {
+    .post(createMiddleware, async (req, res) => {
         try {
             const record = await service.create(req.body);
             res.send(record);

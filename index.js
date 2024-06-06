@@ -9,6 +9,10 @@ import CommentController from './src/controllers/commentController.js';
 import GroupController from './src/controllers/groupController.js';
 import AuthController from './src/controllers/authController.js';
 import UserController from './src/controllers/userController.js';
+import GroupUserController from './src/controllers/groupUserController.js';
+import RoleController from './src/controllers/roleController.js';
+import PermissionController from './src/controllers/permissionController.js';
+import RolePermissionController from './src/controllers/rolePermissionController.js';
 
 const app = express();
 const port = 3001;
@@ -24,6 +28,10 @@ app.use(CommentController);
 app.use(GroupController);
 app.use(AuthController);
 app.use(UserController);
+app.use(GroupUserController);
+app.use(RoleController);
+app.use(PermissionController);
+app.use(RolePermissionController);
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`)
 });
