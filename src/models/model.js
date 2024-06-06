@@ -296,6 +296,7 @@ export default class Model {
         const query = `INSERT INTO ${tableName} (${columns.join(',')}) VALUES (${columns.map(() => '?').join(',')})`;
         if (debugMode) console.log(query, values);
         const [result] = await this.db.execute(query, values);
+        if (!result.insertId) return null;
         return this.find(result.insertId);
     }
 
@@ -323,6 +324,7 @@ export default class Model {
         const query = `UPDATE ${tableName} SET ${props.join(', ')} WHERE ${pkName} = ?`;
         if (debugMode) console.log(query, [...values, pk]);
         await this.db.execute(query, [...values, pk]);
+        if (!result.insertId) return null;
         return this.find(pk);
     }
 

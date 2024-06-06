@@ -7,12 +7,20 @@ import User from '../models/user.js';
 import Question from '../models/question.js';
 import Answer from '../models/answer.js';
 import Comment from '../models/comment.js';
+import Role from '../models/role.js';
+import RolePermission from '../models/rolePermission.js';
+import Permission from '../models/permission.js';
+import GroupUser from '../models/groupUser.js';
 
 const userModel = new User();
 const groupModel = new Group();
 const questionModel = new Question();
 const answerModel = new Answer();
 const commentModel = new Comment();
+const roleModel = new Role();
+const rolePermissionModel = new RolePermission();
+const permissionModel = new Permission();
+const groupUserModel = new GroupUser();
 
 const up = async () => {
 
@@ -43,6 +51,30 @@ const up = async () => {
     await Promise.all(
         seedData.comments.map(async comment => {
             return await commentModel.create(comment);
+        }
+    ));
+
+    await Promise.all(
+        seedData.roles.map(async role => {
+            return await roleModel.create(role);
+        }
+    ));
+
+    await Promise.all(
+        seedData.permissions.map(async permission => {
+            return await permissionModel.create(permission);
+        }
+    ));
+
+    await Promise.all(
+        seedData.rolePermissions.map(async rolePermission => {
+            return await rolePermissionModel.create(rolePermission);
+        }
+    ));
+
+    await Promise.all(
+        seedData.groupUsers.map(async groupUser => {
+            return await groupUserModel.create(groupUser);
         }
     ));
 

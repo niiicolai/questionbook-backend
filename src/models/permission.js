@@ -3,9 +3,9 @@ import databasePool from "../config/database.js";
 
 import ValidationError from '../errors/ValidationError.js';
 
-const validateTitle = (title) => {
-    if (title.length === 0) {
-        throw new ValidationError('Title cannot be empty');
+const validateName = (name) => {
+    if (name.length === 0) {
+        throw new ValidationError('Name cannot be empty');
     }
 }
 
@@ -15,55 +15,27 @@ const validateDescription = (description) => {
     }
 }
 
-const validateGroupId = (groupId) => {
-    if (isNaN(groupId)) {
-        throw new ValidationError('Group ID must be a number');
-    }
-}
-
-const validateUserId = (userId) => {
-    if (isNaN(userId)) {
-        throw new ValidationError('User ID must be a number');
-    }
-}
-
-export default class Question extends Model {
+export default class Permission extends Model {
     constructor(db=databasePool) {
         super(db);
     }
 
     // Define the table name
     tableName() {
-        return 'questions';
+        return 'permissions';
     }
 
     // Define the columns
     columns() {
         return {
-            id: {
-                type: 'INT',
-                primaryKey: true,
-                autoIncrement: true
-            },
-            title: {
+            name: {
                 type: 'VARCHAR(255)',
+                primaryKey: true,
                 notNull: true
             },
             description: {
-                type: 'TEXT',
+                type: 'VARCHAR(255)',
                 notNull: true
-            },
-            groupId: {
-                type: 'INT',
-                notNull: true,
-                foreignKey: true,
-                references: '_groups(id)'
-            },
-            userId: {
-                type: 'INT',
-                notNull: true,
-                foreignKey: true,
-                references: 'users(id)'
             }
         }
     }
@@ -76,10 +48,8 @@ export default class Question extends Model {
      * @async
      */
     async create(data) {
-        validateTitle(data.title);
+        validateName(data.name);
         validateDescription(data.description);
-        validateGroupId(data.groupId);
-        validateUserId(data.userId);
 
         return super.create(data);
     }
@@ -93,10 +63,8 @@ export default class Question extends Model {
      * @async
      */
     async update(pk, data) {
-        if (data.title) validateTitle(data.title);
+        if (data.name) validateName(data.name);
         if (data.description) validateDescription(data.description);
-        if (data.groupId) validateGroupId(data.groupId);
-        if (data.userId) validateUserId(data.userId);
 
         return super.update(pk, data);
     }

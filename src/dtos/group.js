@@ -5,6 +5,5 @@ export default (group) => {
         name: group.name,
         description: group.description,
         coverUrl: group.coverUrl,
-        userId: group.userId
     }
 }

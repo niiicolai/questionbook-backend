@@ -5,12 +5,20 @@ import User from '../models/user.js';
 import Question from '../models/question.js';
 import Answer from '../models/answer.js';
 import Comment from '../models/comment.js';
+import Role from '../models/role.js';
+import RolePermission from '../models/rolePermission.js';
+import Permission from '../models/permission.js';
+import GroupUser from '../models/groupUser.js';
 
 const userModel = new User();
 const groupModel = new Group();
 const questionModel = new Question();
 const answerModel = new Answer();
 const commentModel = new Comment();
+const roleModel = new Role();
+const rolePermissionModel = new RolePermission();
+const permissionModel = new Permission();
+const groupUserModel = new GroupUser();
 
 const up = async () => {
     await userModel.createTable();
@@ -18,6 +26,10 @@ const up = async () => {
     await questionModel.createTable();
     await answerModel.createTable();
     await commentModel.createTable();
+    await roleModel.createTable();
+    await permissionModel.createTable();
+    await rolePermissionModel.createTable();
+    await groupUserModel.createTable();
     
     console.log('Migration complete');
 }
@@ -28,6 +40,10 @@ const down = async () => {
     await questionModel.dropTable();
     await answerModel.dropTable();
     await commentModel.dropTable();
+    await roleModel.dropTable();
+    await permissionModel.dropTable();
+    await rolePermissionModel.dropTable();
+    await groupUserModel.dropTable();
 
     console.log('Rollback complete');
 }

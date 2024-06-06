@@ -3,32 +3,26 @@ import databasePool from "../config/database.js";
 
 import ValidationError from '../errors/ValidationError.js';
 
-const validateDescription = (description) => {
-    if (description.length === 0) {
-        throw new ValidationError('Description cannot be empty');
+const validateRoleName = (roleName) => {
+    if (roleName.length === 0) {
+        throw new ValidationError('Role name cannot be empty');
     }
 }
 
-const validateQuestionId = (questionId) => {
-    if (isNaN(questionId)) {
-        throw new ValidationError('Question ID must be a number');
+const validatePermissionName = (permissionName) => {
+    if (permissionName.length === 0) {
+        throw new ValidationError('Permission name cannot be empty');
     }
 }
 
-const validateUserId = (userId) => {
-    if (isNaN(userId)) {
-        throw new ValidationError('User ID must be a number');
-    }
-}
-
-export default class Answer extends Model {
+export default class RolePermission extends Model {
     constructor(db=databasePool) {
         super(db);
     }
 
     // Define the table name
     tableName() {
-        return 'answers';
+        return 'role_permissions';
     }
 
     // Define the columns
@@ -39,21 +33,17 @@ export default class Answer extends Model {
                 primaryKey: true,
                 autoIncrement: true
             },
-            description: {
-                type: 'TEXT',
-                notNull: true
-            },
-            questionId: {
-                type: 'INT',
+            roleName: {
+                type: 'VARCHAR(255)',
                 notNull: true,
                 foreignKey: true,
-                references: 'questions(id)'
+                references: 'roles(name)'
             },
-            userId: {
-                type: 'INT',
+            permissionName: {
+                type: 'VARCHAR(255)',
                 notNull: true,
                 foreignKey: true,
-                references: 'users(id)'
+                references: 'permissions(name)'
             }
         }
     }
@@ -66,9 +56,8 @@ export default class Answer extends Model {
      * @async
      */
     async create(data) {
-        validateDescription(data.description);
-        validateQuestionId(data.questionId);
-        validateUserId(data.userId);
+        validateRoleName(data.roleName);
+        validatePermissionName(data.permissionName);
 
         return super.create(data);
     }
@@ -82,9 +71,8 @@ export default class Answer extends Model {
      * @async
      */
     async update(pk, data) {
-        if (data.description) validateDescription(data.description);
-        if (data.questionId) validateQuestionId(data.questionId);
-        if (data.userId) validateUserId(data.userId);
+        if (data.roleName) validateRoleName(data.roleName);
+        if (data.permissionName) validatePermissionName(data.permissionName);
 
         return super.update(pk, data);
     }

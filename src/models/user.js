@@ -1,10 +1,42 @@
 import Model from './model.js';
 import databasePool from "../config/database.js";
 import bcrypt from 'bcrypt';
-import NotFoundError from '../errors/NotFoundError.js';
+import ValidationError from '../errors/ValidationError.js';
+
+const validateEmail = (email) => {
+    // ^ asserts the position at the start of the string.
+    // [^\s@]+ matches one or more characters that are not whitespace (\s) or the @ symbol.
+    // @ matches the @ symbol.
+    // [^\s@]+ matches one or more characters that are not whitespace (\s) or the @ symbol.
+    // \. matches a literal dot.
+    // [^\s@]+ matches one or more characters that are not whitespace (\s) or the @ symbol.
+    // $ asserts the position at the end of the string.
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(data.email)) {
+        throw new ValidationError('Invalid email address');
+    }
+}
+
+const validateUsername = (username) => {
+    if (data.username.length === 0) {
+        throw new ValidationError('Username cannot be empty');
+    }
+}
+
+const validatePassword = (password) => {
+    if (data.password.length < 8) {
+        throw new ValidationError('Password must be at least 8 characters');
+    }
+}
+
+const hashPassword = async (password) => {
+    if (!password) throw new ValidationError('Password is required');
+
+    return await bcrypt.hash(password, 10);
+}
 
 export default class User extends Model {
-    constructor(db=databasePool) {
+    constructor(db = databasePool) {
         super(db);
     }
 
@@ -55,12 +87,12 @@ export default class User extends Model {
      * @async
      */
     async create(data) {
-        // Hash the password
-        if (data.password) {
-            data.password = await bcrypt.hash(data.password, 10);
-        }
+        validateEmail(data.email);
+        validateUsername(data.username);
+        validatePassword(data.password);
+        data.password = await hashPassword(data.password);
 
-        return super.create(data);   
+        return super.create(data);
     }
 
     /**
@@ -72,9 +104,11 @@ export default class User extends Model {
      * @async
      */
     async update(pk, data) {
-        // Hash the password
+        if (data.email) validateEmail(data.email);
+        if (data.username) validateUsername(data.username);
         if (data.password) {
-            data.password = await bcrypt.hash(data.password, 10);
+            validatePassword(data.password);
+            data.password = await hashPassword(data.password);
         }
 
         return super.update(pk, data);

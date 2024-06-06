@@ -1,5 +1,35 @@
 
 export default {
+    roles: [
+        {
+            name: 'Group Owner',
+            description: 'The owner of a group'
+        },
+        {
+            name: 'Group Member',
+            description: 'A member of a group'
+        },
+    ],
+    permissions: [        
+        {
+            name: 'group:update',
+            description: 'Update a group'
+        },
+        {
+            name: 'group:delete',
+            description: 'Delete a group'
+        },
+    ],
+    rolePermissions: [
+        {
+            roleName: 'Group Owner',
+            permissionName: 'group:update'
+        },
+        {
+            roleName: 'Group Owner',
+            permissionName: 'group:delete'
+        },
+    ],
     users: [
         {
             username: process.env.DEFAULT_USER_USERNAME,
@@ -12,13 +42,18 @@ export default {
             name: 'Group 1',
             description: 'Description 1',
             coverUrl: 'https://via.placeholder.com/150',
-            userId: 1
         },
         {
             name: 'Group 2',
             description: 'Description 2',
             coverUrl: 'https://via.placeholder.com/150',
-            userId: 1
+        },
+    ],
+    groupUsers: [
+        {
+            userId: 1,
+            groupId: 1,
+            roleName: 'Group Owner'
         },
     ],
     questions: [
