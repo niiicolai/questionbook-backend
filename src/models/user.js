@@ -83,9 +83,6 @@ export default class User extends Model {
     async findByEmail(email) {
         const rows = await this.findWhere({ email });
         const record = rows[0];
-        if (!record) {
-            throw new NotFoundError('User not found');
-        }
         return record;
     }
 
