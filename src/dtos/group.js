@@ -5,5 +5,8 @@ export default (group) => {
         name: group.name,
         description: group.description,
         coverUrl: group.coverUrl,
+        isPrivate: group.isPrivate,
+        createdAt: group.createdAt,
+        updatedAt: group.updatedAt,
     }
 }

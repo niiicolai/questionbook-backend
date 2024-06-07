@@ -36,6 +36,16 @@ export default class Permission extends Model {
             description: {
                 type: 'VARCHAR(255)',
                 notNull: true
+            },
+            createdAt: {
+                type: 'TIMESTAMP',
+                notNull: true,
+                default: 'CURRENT_TIMESTAMP'
+            },
+            updatedAt: {
+                type: 'TIMESTAMP',
+                notNull: true,
+                default: 'CURRENT_TIMESTAMP'
             }
         }
     }

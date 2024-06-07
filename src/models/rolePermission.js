@@ -44,6 +44,16 @@ export default class RolePermission extends Model {
                 notNull: true,
                 foreignKey: true,
                 references: 'permissions(name)'
+            },
+            createdAt: {
+                type: 'TIMESTAMP',
+                notNull: true,
+                default: 'CURRENT_TIMESTAMP'
+            },
+            updatedAt: {
+                type: 'TIMESTAMP',
+                notNull: true,
+                default: 'CURRENT_TIMESTAMP'
             }
         }
     }

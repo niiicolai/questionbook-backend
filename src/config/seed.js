@@ -25,6 +25,24 @@ const groupUserModel = new GroupUser();
 const up = async () => {
 
     await Promise.all(
+        seedData.roles.map(async role => {
+            return await roleModel.create(role);
+        }
+    ));
+
+    await Promise.all(
+        seedData.permissions.map(async permission => {
+            return await permissionModel.create(permission);
+        }
+    ));
+
+    await Promise.all(
+        seedData.rolePermissions.map(async rolePermission => {
+            return await rolePermissionModel.create(rolePermission);
+        }
+    ));
+
+    await Promise.all(
         seedData.users.map(async user => {
             return await userModel.create(user);
         }
@@ -55,24 +73,6 @@ const up = async () => {
     ));
 
     await Promise.all(
-        seedData.roles.map(async role => {
-            return await roleModel.create(role);
-        }
-    ));
-
-    await Promise.all(
-        seedData.permissions.map(async permission => {
-            return await permissionModel.create(permission);
-        }
-    ));
-
-    await Promise.all(
-        seedData.rolePermissions.map(async rolePermission => {
-            return await rolePermissionModel.create(rolePermission);
-        }
-    ));
-
-    await Promise.all(
         seedData.groupUsers.map(async groupUser => {
             return await groupUserModel.create(groupUser);
         }
@@ -82,11 +82,15 @@ const up = async () => {
 }
 
 const down = async () => {
-    await new Group().deleteAll();
-    await new User().deleteAll();
-    await new Question().deleteAll();
-    await new Answer().deleteAll();
-    await new Comment().deleteAll();
+    await groupUserModel.deleteAll();
+    await commentModel.deleteAll();
+    await answerModel.deleteAll();
+    await questionModel.deleteAll();
+    await groupModel.deleteAll();
+    await userModel.deleteAll();
+    await rolePermissionModel.deleteAll();
+    await permissionModel.deleteAll();
+    await roleModel.deleteAll();
 
     console.log('Rollback complete');
 }

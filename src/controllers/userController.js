@@ -7,16 +7,18 @@ import UserDTO from '../dtos/user.js';
 
 import csrfProtection from '../middleware/csrfProtection.js';
 import jwtProtection from '../middleware/jwtProtection.js';
+import userPasswordProtection from '../middleware/userPasswordProtection.js';
 
 const router = express.Router()
 const userService = new EntityService(new User(), UserDTO);
 const authService = new AuthService();
-const stateChangeMiddleware = [jwtProtection, csrfProtection]
+const viewMiddleware = [jwtProtection, csrfProtection]
+const stateChangeMiddleware = [jwtProtection, csrfProtection, userPasswordProtection]
 
-router.route('/api/v1/user/:id')
-    .get(async (req, res) => {
+router.route('/api/v1/user')
+    .get(viewMiddleware, async (req, res) => {
         try {
-            const { id } = req.params;
+            const { sub: id } = req.user;
             const record = await userService.find(id);
             res.send(record);
         } catch (error) { 
@@ -31,7 +33,7 @@ router.route('/api/v1/user/:id')
     })
     .patch(stateChangeMiddleware, async (req, res) => {
         try {
-            const { id } = req.params;
+            const { sub: id } = req.user;
             const record = await userService.update(id, req.body);
             res.send(record);
         } catch (error) { 
@@ -46,7 +48,7 @@ router.route('/api/v1/user/:id')
     })
     .delete(stateChangeMiddleware, async (req, res) => {
         try {
-            const { id } = req.params;
+            const { sub: id } = req.user;
             await userService.delete(id);
             res.sendStatus(204);
         } catch (error) { 
@@ -78,12 +80,13 @@ router.route('/api/v1/users')
     .post(async (req, res) => {
         try {
             const { username, email, password } = req.body;
+            const roleName = 'User'
             const user = await new User().findByEmail(email);
             if (user) {
                 res.status(400).json('Email already in use');
                 return;
             }
-            await userService.create({ username, email, password });
+            await userService.create({ username, email, password, roleName });
             const { accessToken, csrfToken } = await authService.login(email, password);
             res.cookie('csrfToken', csrfToken, { httpOnly: true });
             res.send({ accessToken })

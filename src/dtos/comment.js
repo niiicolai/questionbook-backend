@@ -6,5 +6,7 @@ export default (comment) => {
         answerId: comment.answerId,
         userId: comment.userId,
         username: comment.user_username,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
     }
 }

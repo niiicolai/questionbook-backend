@@ -60,8 +60,10 @@ router.route('/api/v1/answer/:id')
 router.route('/api/v1/answers')
     .get(async (req, res) => {
         try {
-            const { limit, page } = req.query;
-            const records = await service.paginate({limit, page, leftJoin: [{
+            const { limit, page, questionId } = req.query;
+            let where = null;
+            if (questionId) where = { questionId };
+            const records = await service.paginate({limit, page, where, leftJoin: [{
                 table: 'users',
                 on: 'answers.userId = users.id',
                 as: 'user',
@@ -80,7 +82,8 @@ router.route('/api/v1/answers')
     })
     .post(stateChangeMiddleware, async (req, res) => {
         try {
-            const record = await service.create(req.body);
+            const { sub: userId } = req.user;
+            const record = await service.create({...req.body, userId});
             res.send(record);
         } catch (error) { 
             if (error instanceof APIError) {

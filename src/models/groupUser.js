@@ -56,6 +56,16 @@ export default class GroupUser extends Model {
                 notNull: true,
                 foreignKey: true,
                 references: 'roles(name)'
+            },
+            createdAt: {
+                type: 'TIMESTAMP',
+                notNull: true,
+                default: 'CURRENT_TIMESTAMP'
+            },
+            updatedAt: {
+                type: 'TIMESTAMP',
+                notNull: true,
+                default: 'CURRENT_TIMESTAMP'
             }
         }
     }

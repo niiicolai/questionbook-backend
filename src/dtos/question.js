@@ -7,5 +7,7 @@ export default (question) => {
         userId: question.userId,
         groupId: question.groupId,
         username: question.user_username,
+        createdAt: question.createdAt,
+        updatedAt: question.updatedAt,
     }
 }

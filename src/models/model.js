@@ -77,6 +77,10 @@ export default class Model {
                 columnQuery += ' UNIQUE';
             }
 
+            if (columns[key].default) {
+                columnQuery += ` DEFAULT ${columns[key].default}`;
+            }
+
             return columnQuery;
         }).join(', ');
 
@@ -323,7 +327,11 @@ export default class Model {
      */
     async create(data) {
         const tableName = this.tableName();
-        const props = Object.keys(this.columns()).map(key => {
+        let _columns = this.columns();
+        // ensure createdAt and updatedAt are not included in the data
+        delete _columns.createdAt;
+        delete _columns.updatedAt;
+        const props = Object.keys(_columns).map(key => {
             const value = data[key];
             return { key, value }
         }).filter(({ key, value }) => {
@@ -353,10 +361,13 @@ export default class Model {
         const entity = await this.find(pk);
 
         const columns = this.columns();
+        // ensure createdAt are not included in the data
+        delete columns.createdAt;
         const props = Object.keys(columns).map(key => {
             return `${key} = ?`;
         })
         const values = Object.keys(columns).map(key => {
+            if (key === 'updatedAt') return new Date();
             return data[key] || entity[key];
         })
 

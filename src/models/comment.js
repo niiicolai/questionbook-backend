@@ -54,6 +54,16 @@ export default class Comment extends Model {
                 notNull: true,
                 foreignKey: true,
                 references: 'users(id)'
+            },
+            createdAt: {
+                type: 'TIMESTAMP',
+                notNull: true,
+                default: 'CURRENT_TIMESTAMP'
+            },
+            updatedAt: {
+                type: 'TIMESTAMP',
+                notNull: true,
+                default: 'CURRENT_TIMESTAMP'
             }
         }
     }

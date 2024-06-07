@@ -29,8 +29,9 @@ router.route('/api/v1/question/:id')
     })
     .patch(stateChangeMiddleware, async (req, res) => {
         try {
+            const { sub: userId } = req.user;
             const { id } = req.params;
-            const record = await service.update(id, req.body);
+            const record = await service.update(id, {...req.body, userId});
             res.send(record);
         } catch (error) { 
             if (error instanceof APIError) {
@@ -44,7 +45,14 @@ router.route('/api/v1/question/:id')
     })
     .delete(stateChangeMiddleware, async (req, res) => {
         try {
+            const { sub: userId } = req.user;
             const { id } = req.params;
+            const record = await service.find(id);
+            if (record.userId !== userId) {
+                res.status(403).json('Forbidden');
+                return;
+            }
+            
             await service.delete(id);
             res.sendStatus(204);
         } catch (error) { 
@@ -80,7 +88,8 @@ router.route('/api/v1/questions')
     })
     .post(stateChangeMiddleware, async (req, res) => {
         try {
-            const record = await service.create(req.body);
+            const { sub: userId } = req.user;
+            const record = await service.create({...req.body, userId});
             res.send(record);
         } catch (error) { 
             if (error instanceof APIError) {

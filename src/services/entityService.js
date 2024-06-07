@@ -55,6 +55,7 @@ export default class EntityService {
      * @async
      */
     async create(data) {
+        console.log(data);
         const record = await this.entity.create(data);
         return this.dto(record);
     }

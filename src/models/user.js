@@ -75,6 +75,23 @@ export default class User extends Model {
             password: {
                 type: 'VARCHAR(255)',
                 notNull: true
+            },
+            roleName: {
+                type: 'VARCHAR(255)',
+                notNull: true,
+                default: "'User'",
+                foreignKey: true,
+                references: 'roles(name)'
+            },
+            createdAt: {
+                type: 'TIMESTAMP',
+                notNull: true,
+                default: 'CURRENT_TIMESTAMP'
+            },
+            updatedAt: {
+                type: 'TIMESTAMP',
+                notNull: true,
+                default: 'CURRENT_TIMESTAMP'
             }
         }
     }

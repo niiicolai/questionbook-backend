@@ -21,28 +21,30 @@ const permissionModel = new Permission();
 const groupUserModel = new GroupUser();
 
 const up = async () => {
+    await roleModel.createTable();
+    await permissionModel.createTable();
+    await rolePermissionModel.createTable();
+
     await userModel.createTable();
     await groupModel.createTable();
     await questionModel.createTable();
     await answerModel.createTable();
     await commentModel.createTable();
-    await roleModel.createTable();
-    await permissionModel.createTable();
-    await rolePermissionModel.createTable();
     await groupUserModel.createTable();
     
     console.log('Migration complete');
 }
 
 const down = async () => {
+    await roleModel.dropTable();
+    await permissionModel.dropTable();
+    await rolePermissionModel.dropTable();
+
     await userModel.dropTable();
     await groupModel.dropTable();
     await questionModel.dropTable();
     await answerModel.dropTable();
     await commentModel.dropTable();
-    await roleModel.dropTable();
-    await permissionModel.dropTable();
-    await rolePermissionModel.dropTable();
     await groupUserModel.dropTable();
 
     console.log('Rollback complete');

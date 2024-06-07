@@ -21,6 +21,12 @@ const validateCoverUrl = (coverUrl) => {
     }
 }
 
+const validateIsPrivate = (isPrivate) => {
+    if (typeof isPrivate !== 'boolean') {
+        throw new ValidationError('Is Private must be a boolean');
+    }
+}
+
 export default class Group extends Model {
     constructor(db=databasePool) {
         super(db);
@@ -51,6 +57,21 @@ export default class Group extends Model {
                 type: 'VARCHAR(255)',
                 notNull: true
             },
+            isPrivate: {
+                type: 'BOOLEAN',
+                notNull: true,
+                default: '0'
+            },
+            createdAt: {
+                type: 'TIMESTAMP',
+                notNull: true,
+                default: 'CURRENT_TIMESTAMP'
+            },
+            updatedAt: {
+                type: 'TIMESTAMP',
+                notNull: true,
+                default: 'CURRENT_TIMESTAMP'
+            }
         }
     }
 
@@ -65,6 +86,7 @@ export default class Group extends Model {
         validateName(data.name);
         validateDescription(data.description);
         validateCoverUrl(data.coverUrl);
+        validateIsPrivate(data.isPrivate);
 
         return super.create(data);
     }
@@ -81,6 +103,7 @@ export default class Group extends Model {
         if (data.name) validateName(data.name);
         if (data.description) validateDescription(data.description);
         if (data.coverUrl) validateCoverUrl(data.coverUrl);
+        if (data.isPrivate) validateIsPrivate(data.isPrivate);
 
         return super.update(pk, data);
     }

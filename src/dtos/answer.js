@@ -6,5 +6,7 @@ export default (answer) => {
         questionId: answer.questionId,
         userId: answer.userId,
         username: answer.user_username,
+        createdAt: answer.createdAt,
+        updatedAt: answer.updatedAt,
     }
 }
