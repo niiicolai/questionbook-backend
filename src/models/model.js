@@ -324,7 +324,6 @@ export default class Model {
         const query = `UPDATE ${tableName} SET ${props.join(', ')} WHERE ${pkName} = ?`;
         if (debugMode) console.log(query, [...values, pk]);
         await this.db.execute(query, [...values, pk]);
-        if (!result.insertId) return null;
         return this.find(pk);
     }
 

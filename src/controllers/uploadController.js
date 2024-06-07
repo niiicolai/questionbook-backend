@@ -6,7 +6,13 @@ import jwtProtection from '../middleware/jwtProtection.js';
 import csrfProtection from '../middleware/csrfProtection.js';
 import imageProtection from '../middleware/imageProtection.js';
 
-const upload = multer({ dest: 'uploads/' })
+const fileFilter = (req, file, cb) => {
+    const match = file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/);
+    cb(null, !!match);
+}
+
+const storage = multer.memoryStorage()
+const upload = multer({ dest: 'uploads/', fileFilter, storage })
 const service = new UploadService({ path: 'uploads/' });
 const router = express.Router()
 const putMiddleware = [jwtProtection, csrfProtection, imageProtection.putProtection]
@@ -17,8 +23,9 @@ router.route('/api/v1/image/:filename')
         try {
             const { filename } = req.params;
             const { file } = await service.find(filename);
-            res.sendFile(file);
-        } catch (error) { 
+            const base64 = Buffer.from(file).toString('base64');
+            res.send(base64);
+        } catch (error) {
             if (error instanceof APIError) {
                 res.status(error.code).json(error.message);
                 return;
@@ -33,7 +40,7 @@ router.route('/api/v1/image/:filename')
             const { filename } = req.params;
             await service.delete(filename);
             res.sendStatus(204);
-        } catch (error) { 
+        } catch (error) {
             if (error instanceof APIError) {
                 res.status(error.code).json(error.message);
                 return;
@@ -43,15 +50,15 @@ router.route('/api/v1/image/:filename')
             res.status(500).json('Internal Server Error');
         }
     })
-router.route('/api/v1/image')
-    .put(putMiddleware, upload.single('image'), async (req, res) => {
+router.route('/api/v1/images')
+    .put(upload.single('file'), putMiddleware, async (req, res) => {
         try {
             const { sub: ownerId } = req.user;
             const { file } = req;
-            const { type } = req.body;
-            const record = await service.put(file, ownerId, type);
+            const { type, uuid } = req.body;
+            const record = await service.put(file, uuid, ownerId, type);
             res.send(record);
-        } catch (error) { 
+        } catch (error) {
             if (error instanceof APIError) {
                 res.status(error.code).json(error.message);
                 return;

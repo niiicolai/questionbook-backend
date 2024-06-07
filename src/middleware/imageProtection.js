@@ -1,16 +1,17 @@
 import UploadService from "../services/uploadService.js";
-
+import NotFoundError from "../errors/NotFoundError.js";
 const uploadService = new UploadService({ path: 'uploads' });
+const debug = process.env.DEBUG;
 
 async function putProtection(req, res, next) {
     const { sub: userId } = req.user;
     const { file } = req;
-    const { type, uuid } = req.params;
-
+    const { type, uuid } = req.body;
+    
     try {
         const filename = uploadService.filename(file, uuid, userId, type);
         const details = await uploadService.find(filename);
-        if (!details) next(); // If the file does not exist, it is a new file.
+        if (!details) return next(); // If the file does not exist, it is a new file.
         else {
             // If the file exists, check if the user is the owner.
             const { ownerId } = details;
@@ -20,6 +21,8 @@ async function putProtection(req, res, next) {
             }
         }
     } catch (error) {
+        if (error instanceof NotFoundError) return next();
+        if (debug) console.error(error);
         res.status(404).json('Not found');
         return;
     }
@@ -38,6 +41,7 @@ async function deleteProtection(req, res, next) {
             return;
         }
     } catch (error) {
+        if (debug) console.error(error);
         res.status(404).json('Not found');
         return;
     }

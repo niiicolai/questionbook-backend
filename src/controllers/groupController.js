@@ -1,25 +1,36 @@
 import express from 'express'
 import APIError from '../errors/APIError.js';
 import EntityService from '../services/entityService.js';
+
 import Group from '../models/group.js';
 import GroupDTO from '../dtos/group.js';
+import GroupUser from '../models/groupUser.js';
+import GroupUserDTO from '../dtos/groupUser.js';
+import User from '../models/user.js';
+import UserDTO from '../dtos/userPublic.js';
 
 import csrfProtection from '../middleware/csrfProtection.js';
 import jwtProtection from '../middleware/jwtProtection.js';
 import groupProtection from '../middleware/groupProtection.js';
 
 const router = express.Router()
+
 const service = new EntityService(new Group(), GroupDTO);
+const groupUserService = new EntityService(new GroupUser(), GroupUserDTO);
+const userService = new EntityService(new User(), UserDTO);
+
 const createMiddleware = [jwtProtection, csrfProtection]
-const patchMiddleware = [jwtProtection, csrfProtection, groupProtection('group:update')]
-const deleteMiddleware = [jwtProtection, csrfProtection, groupProtection('group:delete')]
+const patchMiddleware = [jwtProtection, csrfProtection, groupProtection(['group:update'])]
+const deleteMiddleware = [jwtProtection, csrfProtection, groupProtection(['group:delete'])]
 
 router.route('/api/v1/group/:id')
     .get(async (req, res) => {
         try {
             const { id } = req.params;
-            const record = await service.find(id);
-            res.send(record);
+            const group = await service.find(id);
+            const ownerGroupUser = await new GroupUser().findByGroupIdAndRoleName(id, 'Group Owner');
+            const owner = await userService.find(ownerGroupUser.userId);
+            res.send({ group, owner });
         } catch (error) { 
             if (error instanceof APIError) {
                 res.status(error.code).json(error.message);
@@ -78,8 +89,12 @@ router.route('/api/v1/groups')
     })
     .post(createMiddleware, async (req, res) => {
         try {
-            const record = await service.create(req.body);
-            res.send(record);
+            const { sub: userId } = req.user;
+            const group = await service.create(req.body);
+            const groupUser = await groupUserService.create({ 
+                groupId: group.id, userId, roleName: 'Group Owner'
+            });
+            res.send({ group, groupUser });
         } catch (error) { 
             if (error instanceof APIError) {
                 res.status(error.code).json(error.message);

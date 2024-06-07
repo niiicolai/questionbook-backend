@@ -25,11 +25,11 @@ export default class AuthService {
             throw new UnauthorizedError('Invalid email or password');
         }
 
+        const { csrfToken, csrfSecret } = await csrf.create();
         const iat = Math.floor(Date.now() / 1000);
         const expiresIn = process.env.JWT_EXPIRES_IN;
-        const payload = { id: user.id, iat, expiresIn };
+        const payload = { sub: user.id, iat, expiresIn, csrfSecret };
         const accessToken = jwt.sign(payload, process.env.JWT_SECRET);
-        const csrfToken = csrf.create();
 
         return { accessToken, csrfToken }
     }

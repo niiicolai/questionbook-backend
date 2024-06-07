@@ -1,10 +1,14 @@
 import Tokens from 'csrf';
 
 const token = Tokens();
-const secret = token.secretSync();
 
 export default {
-    secret,
-    create: ()=> token.create(secret),
-    verify: ()=> token.verify(secret),
+    create: async () => {
+        const csrfSecret = await token.secret();
+        const csrfToken = token.create(csrfSecret);
+        return { csrfToken, csrfSecret };
+    },
+    verify: async (inputToken, inputSecret) => {
+        return await token.verify(inputToken, inputSecret)
+    },
 }

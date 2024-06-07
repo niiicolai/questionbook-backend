@@ -108,4 +108,10 @@ export default class GroupUser extends Model {
         const record = rows[0];
         return record;
     }
+
+    async findByGroupIdAndRoleName(groupId, roleName) {
+        const rows = await this.findWhere({ groupId, roleName });
+        const record = rows[0];
+        return record;
+    }
 }

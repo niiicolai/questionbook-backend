@@ -6,6 +6,7 @@ export default function groupProtection(requiredPermissionNames=[]) {
     return async (req, res, next) => {
         const { sub: userId } = req.user;
         const { id: groupId } = req.params;
+        console.log('groupId', groupId);
 
         const groupUser = await new GroupUser().findByGroupIdAndUserId(groupId, userId);
         if (!groupUser) {
@@ -13,7 +14,7 @@ export default function groupProtection(requiredPermissionNames=[]) {
             return;
         }
 
-        const role = await new Role().findById(groupUser.roleId);
+        const role = await new Role().find(groupUser.roleName);
         if (!role) {
             res.status(500).json('Internal Server Error');
             return;
@@ -27,7 +28,7 @@ export default function groupProtection(requiredPermissionNames=[]) {
 
         const permissionNames = rolePermissions.map(rolePermission => rolePermission.permissionName);
         req.permissions = permissionNames;
-
+        
         if (requiredPermissionNames.length > 0) {
             for (const requiredPermissionName of requiredPermissionNames) {
                 if (!permissionNames.includes(requiredPermissionName)) {

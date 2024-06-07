@@ -61,13 +61,13 @@ export default class EntityService {
     /**
      * @function update
      * @description Update a record
-     * @param {Number} pk The primary key
+     * @param {string} pk The primary key
      * @param {Object} data The data
      * @returns {Object} The record
      * @async
      */
-    async update(data) {
-        const record = await this.entity.update(data);
+    async update(pk, data) {
+        const record = await this.entity.update(pk, data);
         return this.dto(record);
     }
 

@@ -66,7 +66,7 @@ export default class UploadService {
             throw new BadArgumentError('File is required');
         }
 
-        if (!id) {
+        if (!uuid) {
             throw new BadArgumentError('ID is required');
         }
 
@@ -81,10 +81,10 @@ export default class UploadService {
         const { buffer } = file;
         const filename = this.filename(file, uuid, ownerId, type);
         const filepath = path.join(this.path, filename);
-
+        
         fs.writeFileSync(filepath, buffer);
 
-        return filename;
+        return { filename };
     }
 
     async delete(filename) {
