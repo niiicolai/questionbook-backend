@@ -48,6 +48,28 @@ router.route('/api/v1/group_user/:id')
     .delete(modifyMiddleware, async (req, res) => {
         try {
             const { id } = req.params;
+            const record = await service.find(id);
+            
+            if (!record) {
+                res.status(404).json('Record not found');
+                return;
+            }
+            
+            if (record.roleName === 'Group Owner') {
+                res.status(400).json('Cannot remove the owner of a group');
+                return;
+            }
+
+            const { count } = await service.paginate({
+                limit: 1, page: 1,
+                where: { groupId: record.groupId }
+            });
+            console.log(count);
+            if (count === 1) {
+                res.status(400).json('Cannot remove the last member of a group');
+                return;
+            }
+
             await service.delete(id);
             res.sendStatus(204);
         } catch (error) { 
@@ -63,8 +85,18 @@ router.route('/api/v1/group_user/:id')
 router.route('/api/v1/group_users')
     .get(async (req, res) => {
         try {
-            const { limit, page } = req.query;
-            const records = await service.paginate({limit, page});
+            const { limit, page, groupId, userId } = req.query;
+            let where = null;
+            if (groupId) where = { groupId };
+            if (userId) where = { userId };
+            const records = await service.paginate({
+                limit, page, where, leftJoin: [{
+                    table: 'users',
+                    on: '_group_users.userId = users.id',
+                    as: 'user',
+                    columns: ['id', 'username'],
+                }]
+            });
             res.send(records);
         } catch (error) { 
             if (error instanceof APIError) {

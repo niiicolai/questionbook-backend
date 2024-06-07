@@ -4,6 +4,7 @@ export default (comment) => {
         id: comment.id,
         description: comment.description,
         answerId: comment.answerId,
-        userId: comment.userId
+        userId: comment.userId,
+        username: comment.user_username,
     }
 }

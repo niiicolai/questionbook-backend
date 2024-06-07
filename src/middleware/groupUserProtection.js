@@ -6,6 +6,7 @@ export default async function groupUserProtection(req, res, next) {
 
     const model = new GroupUser();
     const ownEntity = await model.findByIdAndUserId(groupUserId, userId);
+    console.log(ownEntity, groupUserId, userId);
     if (!ownEntity) {
         res.status(403).json('Forbidden');
         return;

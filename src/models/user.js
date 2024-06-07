@@ -12,19 +12,19 @@ const validateEmail = (email) => {
     // [^\s@]+ matches one or more characters that are not whitespace (\s) or the @ symbol.
     // $ asserts the position at the end of the string.
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(data.email)) {
+    if (!emailRegex.test(email)) {
         throw new ValidationError('Invalid email address');
     }
 }
 
 const validateUsername = (username) => {
-    if (data.username.length === 0) {
+    if (username.length === 0) {
         throw new ValidationError('Username cannot be empty');
     }
 }
 
 const validatePassword = (password) => {
-    if (data.password.length < 8) {
+    if (password.length < 8) {
         throw new ValidationError('Password must be at least 8 characters');
     }
 }

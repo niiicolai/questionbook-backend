@@ -239,7 +239,7 @@ export default class Model {
      * @throws {BadArgumentError} Page must be greater than 0
      * @async
      */
-    async paginate({ limit = 10, page = 1 }) {
+    async paginate({ limit = 10, page = 1, where = null, leftJoin = null }) {
         if (!limit || isNaN(limit)) {
             throw new BadArgumentError('Limit is required and must be a number');
         } else {
@@ -262,14 +262,53 @@ export default class Model {
 
         const offset = (page - 1) * limit;
         const tableName = this.tableName();
-        const selectQuery = `SELECT * FROM ${tableName} LIMIT ? OFFSET ?`;
-        const countQuery = `SELECT COUNT(*) as count FROM ${tableName}`;
-        if (debugMode) {
-            console.log(selectQuery, [limit, offset]);
-            console.log(countQuery);
+        const selectParams = [];
+        const countParams = [];
+        let selectColumns = '';
+        selectColumns = Object.keys(this.columns()).map(column => {
+            return `${tableName}.${column}`;
+        }).join(', ');
+        
+        // A bit messy, but add the left join columns
+        // using aliases to avoid column name conflicts
+        if (leftJoin) {
+            for (const join of leftJoin) {
+                const table = join.table;
+                const as = join.as;
+                const cols = join.columns.map(column => {
+                    return `${table}.${column} as ${as}_${column}`;
+                }).join(', ');
+                selectColumns += `, ${cols}`;
+            }
         }
-        const [rows] = await this.db.query(selectQuery, [limit, offset]);
-        const _count = await this.db.query(countQuery);
+
+        let selectQuery = `SELECT ${selectColumns} FROM ${tableName}`;
+        let countQuery = `SELECT COUNT(*) as count FROM ${tableName}`;
+        if (leftJoin) {
+            for (const join of leftJoin) {
+                selectQuery += ` LEFT JOIN ${join.table} ON ${join.on}`;
+            }
+        }
+        if (where) {
+            const whereKeys = Object.keys(where);
+            const whereQuery = whereKeys.map(key => {
+                return `${key} = ?`;
+            }).join(' AND ');
+            selectQuery += ` WHERE ${whereQuery}`;
+            countQuery += ` WHERE ${whereQuery}`;
+            const values = Object.values(where);
+            selectParams.push(...values);
+            countParams.push(...values);
+        }
+        selectQuery += ` LIMIT ? OFFSET ?`;
+        selectParams.push(limit, offset);
+        
+        if (debugMode) {
+            console.log(selectQuery, selectParams);
+            console.log(countQuery, countParams);
+        }
+        const [rows] = await this.db.query(selectQuery, selectParams);
+        const _count = await this.db.query(countQuery, countParams);
         const count = _count[0][0].count;
         const pages = Math.ceil(count / limit);
         return { rows, pages, count }

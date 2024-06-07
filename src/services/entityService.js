@@ -16,8 +16,8 @@ export default class EntityService {
      * @returns {Object} Entity
      * @async
      */
-    async find(pk) {
-        const record = await this.entity.find(pk);
+    async find(pk, where=null) {
+        const record = await this.entity.find(pk, where);
         return this.dto(record)
     }
 
@@ -38,11 +38,12 @@ export default class EntityService {
      * @param {Object} options
      * @param {Number} options.limit
      * @param {Number} options.page
+     * @param {Object} options.where
      * @returns {Object} Paginated entities
      * @async
      */
-    async paginate({limit=10, page=1}) {    
-        const { rows, count, pages } = await this.entity.paginate({limit, page});
+    async paginate({limit=10, page=1, where=null, leftJoin = null}) {    
+        const { rows, count, pages } = await this.entity.paginate({limit, page, where, leftJoin});
         return { rows: rows.map(this.dto), count, pages }; 
     }
 

@@ -59,6 +59,7 @@ router.route('/api/v1/group/:id')
     .delete(deleteMiddleware, async (req, res) => {
         try {
             const { id } = req.params;
+            // TODO: Cascade delete foreign key constraints
             await service.delete(id);
             res.sendStatus(204);
         } catch (error) { 

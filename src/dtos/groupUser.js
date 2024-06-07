@@ -5,5 +5,6 @@ export default (groupUser) => {
         userId: groupUser.userId,
         groupId: groupUser.groupId,
         roleName: groupUser.roleName,
+        username: groupUser.user_username,
     }
 }

@@ -5,6 +5,7 @@ export default (question) => {
         title: question.title,
         description: question.description,
         userId: question.userId,
-        groupId: question.groupId
+        groupId: question.groupId,
+        username: question.user_username,
     }
 }

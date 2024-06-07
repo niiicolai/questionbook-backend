@@ -61,7 +61,12 @@ router.route('/api/v1/answers')
     .get(async (req, res) => {
         try {
             const { limit, page } = req.query;
-            const records = await service.paginate({limit, page});
+            const records = await service.paginate({limit, page, leftJoin: [{
+                table: 'users',
+                on: 'answers.userId = users.id',
+                as: 'user',
+                columns: ['id', 'username'],
+            }]});
             res.send(records);
         } catch (error) { 
             if (error instanceof APIError) {

@@ -75,9 +75,14 @@ router.route('/api/v1/users')
             res.status(500).json('Internal Server Error');
         }
     })
-    .post(stateChangeMiddleware, async (req, res) => {
+    .post(async (req, res) => {
         try {
             const { username, email, password } = req.body;
+            const user = await new User().findByEmail(email);
+            if (user) {
+                res.status(400).json('Email already in use');
+                return;
+            }
             await userService.create({ username, email, password });
             const { accessToken, csrfToken } = await authService.login(email, password);
             res.cookie('csrfToken', csrfToken, { httpOnly: true });

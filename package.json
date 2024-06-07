@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest",
-    "start": "set DEBUG=express:* & nodemon index.js",
+    "start": "nodemon index.js",
     "migrate": "node ./src/config/migrate.js up",
     "migrate:undo": "node ./src/config/migrate.js down",
     "seed": "node ./src/config/seed.js up",

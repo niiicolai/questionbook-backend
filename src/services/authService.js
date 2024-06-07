@@ -26,9 +26,10 @@ export default class AuthService {
         }
 
         const { csrfToken, csrfSecret } = await csrf.create();
+        const username = user.username;
         const iat = Math.floor(Date.now() / 1000);
         const expiresIn = process.env.JWT_EXPIRES_IN;
-        const payload = { sub: user.id, iat, expiresIn, csrfSecret };
+        const payload = { sub: user.id, iat, expiresIn, csrfSecret, username };
         const accessToken = jwt.sign(payload, process.env.JWT_SECRET);
 
         return { accessToken, csrfToken }
