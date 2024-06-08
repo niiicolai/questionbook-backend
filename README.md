@@ -44,7 +44,17 @@ docker run -p 3001:3001 backend:v1.0
 docker build -t backend:v1.0 .
 ```
 
-2. Run Docker container
+2. Create and set up .env file
+```bash
+cp .env.example .env
+```
+
+3. Create and set up .env.db file
+```bash
+cp .env.db.example .env.db
+```
+
+4. Run Docker container
 ```bash
 docker compose up -d
 ```

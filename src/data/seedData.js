@@ -48,15 +48,15 @@ export default {
     ],
     users: [
         {
-            username: process.env.DEFAULT_USER_USERNAME,
-            email: process.env.DEFAULT_USER_EMAIL,
-            password: process.env.DEFAULT_USER_PASSWORD,
+            username: process.env.DEFAULT_ADMIN_USERNAME,
+            email: process.env.DEFAULT_ADMIN_EMAIL,
+            password: process.env.DEFAULT_ADMIN_PASSWORD,
             roleName: 'System Administrator'
         },
         {
-            username: 'test-user',
-            email: 'test-user@test.dk',
-            password: 'test-password',
+            username: process.env.DEFAULT_USER_USERNAME,
+            email: process.env.DEFAULT_USER_EMAIL,
+            password: process.env.DEFAULT_USER_PASSWORD,
             roleName: 'User'
         },
     ],
