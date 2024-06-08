@@ -4,13 +4,13 @@ import bcrypt from 'bcrypt';
 import ValidationError from '../errors/ValidationError.js';
 
 const validateEmail = (email) => {
-    // ^ asserts the position at the start of the string.
-    // [^\s@]+ matches one or more characters that are not whitespace (\s) or the @ symbol.
-    // @ matches the @ symbol.
-    // [^\s@]+ matches one or more characters that are not whitespace (\s) or the @ symbol.
-    // \. matches a literal dot.
-    // [^\s@]+ matches one or more characters that are not whitespace (\s) or the @ symbol.
-    // $ asserts the position at the end of the string.
+    // 1. ^ asserts the position at the start of the string.
+    // 2. [^\s@]+ matches one or more characters that are not whitespace (\s) or the @ symbol.
+    // 3. @ matches the @ symbol.
+    // 4. [^\s@]+ matches one or more characters that are not whitespace (\s) or the @ symbol.
+    // 5. \. matches a literal dot.
+    // 6. [^\s@]+ matches one or more characters that are not whitespace (\s) or the @ symbol.
+    // 7. $ asserts the position at the end of the string.
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
         throw new ValidationError('Invalid email address');
@@ -23,16 +23,44 @@ const validateUsername = (username) => {
     }
 }
 
-const validatePassword = (password) => {
+const validatePassword = (password, username, email) => {
     if (password.length < 8) {
         throw new ValidationError('Password must be at least 8 characters');
+    }
+
+    // (?=.*[a-z]) asserts that the password contains at least one lowercase letter.
+    if (!/(?=.*[a-z])/.test(password)) {
+        throw new ValidationError('Password must contain at least one lowercase letter');
+    }
+
+    // (?=.*[A-Z]) asserts that the password contains at least one uppercase letter.
+    if (!/(?=.*[A-Z])/.test(password)) {
+        throw new ValidationError('Password must contain at least one uppercase letter');
+    }
+
+    // (?=.*[0-9]) asserts that the password contains at least one digit.
+    if (!/(?=.*[0-9])/.test(password)) {
+        throw new ValidationError('Password must contain at least one digit');
+    }
+
+    // (?=.*[!@#$%^&*]) asserts that the password contains at least one special character.
+    if (!/(?=.*[!@#$%^&*])/.test(password)) {
+        throw new ValidationError('Password must contain at least one special character');
+    }
+
+    if (password.includes(username)) {
+        throw new ValidationError('Password cannot contain the username');
+    }
+
+    if (password.includes(email)) {
+        throw new ValidationError('Password cannot contain the email');
     }
 }
 
 const hashPassword = async (password) => {
     if (!password) throw new ValidationError('Password is required');
-
-    return await bcrypt.hash(password, 10);
+    const saltRounds = 10;
+    return await bcrypt.hash(password, saltRounds);
 }
 
 export default class User extends Model {
@@ -106,7 +134,7 @@ export default class User extends Model {
     async create(data) {
         validateEmail(data.email);
         validateUsername(data.username);
-        validatePassword(data.password);
+        validatePassword(data.password, data.username, data.email);
         data.password = await hashPassword(data.password);
 
         return super.create(data);
@@ -124,7 +152,9 @@ export default class User extends Model {
         if (data.email) validateEmail(data.email);
         if (data.username) validateUsername(data.username);
         if (data.password) {
-            validatePassword(data.password);
+            const record = await this.find(pk);
+            const { username, email } = record;
+            validatePassword(data.password, username, email);
             data.password = await hashPassword(data.password);
         }
 

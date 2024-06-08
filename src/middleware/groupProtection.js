@@ -6,7 +6,6 @@ export default function groupProtection(requiredPermissionNames=[]) {
     return async (req, res, next) => {
         const { sub: userId } = req.user;
         const { id: groupId } = req.params;
-        console.log('groupId', groupId);
 
         const groupUser = await new GroupUser().findByGroupIdAndUserId(groupId, userId);
         if (!groupUser) {
