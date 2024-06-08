@@ -9,7 +9,7 @@ import jwtProtection from '../middleware/jwtProtection.js';
 
 const router = express.Router()
 const service = new EntityService(new Answer(), AnswerDTO);
-const stateChangeMiddleware = [jwtProtection, csrfProtection]
+const stateChangeMiddleware = [jwtProtection, csrfProtection.originProtection, csrfProtection.tokenProtection]
 
 router.route('/api/v1/answer/:id')
     .get(async (req, res) => {

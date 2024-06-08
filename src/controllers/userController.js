@@ -12,8 +12,8 @@ import userPasswordProtection from '../middleware/userPasswordProtection.js';
 const router = express.Router()
 const userService = new EntityService(new User(), UserDTO);
 const authService = new AuthService();
-const viewMiddleware = [jwtProtection, csrfProtection]
-const stateChangeMiddleware = [jwtProtection, csrfProtection, userPasswordProtection]
+const viewMiddleware = [jwtProtection, csrfProtection.originProtection]
+const stateChangeMiddleware = [jwtProtection, csrfProtection.originProtection, csrfProtection.tokenProtection, userPasswordProtection]
 
 router.route('/api/v1/user')
     .get(viewMiddleware, async (req, res) => {

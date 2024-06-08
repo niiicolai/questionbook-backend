@@ -11,8 +11,8 @@ import groupUserProtection from '../middleware/groupUserProtection.js';
 const router = express.Router()
 const model = new GroupUser();
 const service = new EntityService(model, GroupUserDTO);
-const createMiddleware = [jwtProtection, csrfProtection]
-const modifyMiddleware = [jwtProtection, csrfProtection, groupUserProtection]
+const createMiddleware = [jwtProtection, csrfProtection.originProtection, csrfProtection.tokenProtection]
+const modifyMiddleware = [jwtProtection, csrfProtection.originProtection, csrfProtection.tokenProtection, groupUserProtection]
 
 router.route('/api/v1/group_user/:id')
     .get(async (req, res) => {

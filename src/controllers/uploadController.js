@@ -15,8 +15,8 @@ const storage = multer.memoryStorage()
 const upload = multer({ dest: 'uploads/', fileFilter, storage })
 const service = new UploadService({ path: 'uploads/' });
 const router = express.Router()
-const putMiddleware = [jwtProtection, csrfProtection, imageProtection.putProtection]
-const modifyMiddleware = [jwtProtection, csrfProtection, imageProtection.deleteProtection]
+const putMiddleware = [jwtProtection, csrfProtection.originProtection, csrfProtection.tokenProtection, imageProtection.putProtection]
+const modifyMiddleware = [jwtProtection, csrfProtection.originProtection, csrfProtection.tokenProtection, imageProtection.deleteProtection]
 
 router.route('/api/v1/image/:filename')
     .get(async (req, res) => {
