@@ -91,9 +91,9 @@ router.route('/api/v1/question/:id')
     })
     .patch(modifyMiddleware, async (req, res) => {
         try {
-            const { sub: userId } = req.user;
             const { id } = req.params;
-            const record = await service.update(id, { ...req.body, userId });
+            if (req.body.userId) delete req.body.userId;
+            const record = await service.update(id, { ...req.body });
             res.send(record);
         } catch (error) {
             if (error instanceof APIError) {

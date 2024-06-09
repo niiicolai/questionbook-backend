@@ -29,7 +29,7 @@ const groupMemberService = new GroupMemberService();
 const permissionService = new PermissionService();
 
 const memberCheckMiddleware = [
-    jwtProtection,
+    jwtDiscovery,
 ]
 const createMiddleware = [
     jwtProtection,
@@ -73,6 +73,7 @@ router.route('/api/v1/is-member/group/:id')
     .get(memberCheckMiddleware, async (req, res) => {
         try {
             const { id } = req.params;
+            if (!req.user) return res.send({ isMember: false });
             const isMember = await groupMemberService.isPartOfGroup(req.user.sub, id);
             res.send({ isMember });
         } catch (error) {

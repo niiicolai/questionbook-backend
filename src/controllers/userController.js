@@ -2,16 +2,19 @@ import express from 'express'
 import APIError from '../errors/APIError.js';
 import EntityService from '../services/entityService.js';
 import AuthService from '../services/authService.js';
+import PermissionService from '../services/permissionService.js';
 import User from '../models/user.js';
 import UserDTO from '../dtos/user.js';
 
 import csrfProtection from '../middleware/csrfProtection.js';
 import jwtProtection from '../middleware/jwtProtection.js';
 import userPasswordProtection from '../middleware/userPasswordProtection.js';
+import jwtDiscovery from '../middleware/jwtDiscovery.js';
 
 const router = express.Router()
 const userService = new EntityService(new User(), UserDTO);
 const authService = new AuthService();
+const permissionService = new PermissionService();
 const viewMiddleware = [jwtProtection, csrfProtection.originProtection]
 const stateChangeMiddleware = [jwtProtection, csrfProtection.originProtection, csrfProtection.tokenProtection, userPasswordProtection]
 
@@ -100,5 +103,27 @@ router.route('/api/v1/users')
             res.status(500).json('Internal Server Error');
         }
     })
+router.route('/api/v1/user-has-global-permission/:permission')
+    .get(jwtDiscovery, async (req, res) => {
+        try {
+            if (!req.user) {
+                res.send({ hasPermission: false });
+                return;
+            }
+            
+            const { sub: id } = req.user;
+            const hasPermission = await permissionService.haveGlobalPermissions(
+                id, [req.params.permission]
+            );
+            res.send({ hasPermission });
+        } catch (error) { 
+            if (error instanceof APIError) {
+                res.status(error.code).json(error.message);
+                return;
+            }
 
+            console.log(error);
+            res.status(500).json('Internal Server Error');
+        }
+    })
 export default router;

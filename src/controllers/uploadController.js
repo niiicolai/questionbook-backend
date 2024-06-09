@@ -6,7 +6,6 @@ import jwtProtection from '../middleware/jwtProtection.js';
 import csrfProtection from '../middleware/csrfProtection.js';
 import imageProtection from '../middleware/imageProtection.js';
 
-
 const storage = multer.memoryStorage()
 const upload = multer({ dest: 'uploads/', storage })
 const service = new UploadService({ path: 'uploads/' });

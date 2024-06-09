@@ -109,6 +109,7 @@ router.route('/api/v1/comment/:id')
     .patch(modifyMiddleware, async (req, res) => {
         try {
             const { id } = req.params;
+            if (req.body.userId) delete req.body.userId;
             const record = await service.update(id, req.body);
             res.send(record);
         } catch (error) { 

@@ -43,6 +43,10 @@ export default {
             name: 'comment:bypass:ownership',
             description: 'Modify any comment even if you are not the owner'
         },
+        {
+            name: 'group_user:bypass:ownership',
+            description: 'Modify any group user even if you are not the owner'
+        }
     ],
     rolePermissions: [
         {
@@ -64,6 +68,10 @@ export default {
         {
             roleName: 'System Administrator',
             permissionName: 'answer:bypass:ownership'
+        },
+        {
+            roleName: 'System Administrator',
+            permissionName: 'group_user:bypass:ownership'
         },
         {
             roleName: 'System Administrator',

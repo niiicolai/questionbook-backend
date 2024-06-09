@@ -1,22 +1,39 @@
-import GroupMemberService from "../services/groupMemberService.js";
+import PermissionService from '../services/permissionService.js';
+import GroupUser from "../models/groupUser.js";
 
-const groupMemberService = new GroupMemberService();
+const permissionService = new PermissionService();
 
-export default async function groupUserProtection(req, res, next) {
-    const { sub: userId } = req.user;
-    const { id: groupUserId } = req.params;
-    console.log(userId, groupUserId);
-    try {
-        console.log(userId, groupUserId);
-        const isMember = await groupMemberService.isPartOfGroup(userId, groupUserId);
-        if (!isMember) {
-            res.status(403).json('Forbidden');
+function ownershipProtection(bypassPermissionNames=[]) {
+    if (!Array.isArray(bypassPermissionNames)) {
+        throw new Error('bypassPermissionNames must be an array');
+    }
+    return async (req, res, next) => {
+        const { sub: userId } = req.user;
+        const { groupId } = req.params;
+
+        if (!groupId) {
+            res.status(400).json('Bad Request');
             return;
         }
 
-        next();
-    } catch (error) {
-        console.error(error);
+        const model = new GroupUser();
+        const record = await model.findByGroupIdAndUserId(groupId, userId);
+        if (record) {
+            next();
+            return;
+        }
+
+        const havePermissions = await permissionService
+            .haveGlobalPermissions(userId, bypassPermissionNames);
+            if (havePermissions) {
+                next();
+                return;
+            }
+
         res.status(403).json('Forbidden');
     }
+}
+
+export default  {
+    ownershipProtection
 }
