@@ -27,6 +27,22 @@ export default {
             name: 'group:delete',
             description: 'Delete a group'
         },
+        {
+            name: 'group:bypass:membership',
+            description: 'View all groups even if they are not members'
+        },
+        {
+            name: 'question:bypass:ownership',
+            description: 'Modify any question even if you are not the owner'
+        },
+        {
+            name: 'answer:bypass:ownership',
+            description: 'Modify any answer even if you are not the owner'
+        },
+        {
+            name: 'comment:bypass:ownership',
+            description: 'Modify any comment even if you are not the owner'
+        },
     ],
     rolePermissions: [
         {
@@ -36,6 +52,22 @@ export default {
         {
             roleName: 'System Administrator',
             permissionName: 'group:delete'
+        },
+        {
+            roleName: 'System Administrator',
+            permissionName: 'group:bypass:membership'
+        },
+        {
+            roleName: 'System Administrator',
+            permissionName: 'question:bypass:ownership'
+        },
+        {
+            roleName: 'System Administrator',
+            permissionName: 'answer:bypass:ownership'
+        },
+        {
+            roleName: 'System Administrator',
+            permissionName: 'comment:bypass:ownership'
         },
         {
             roleName: 'Group Owner',

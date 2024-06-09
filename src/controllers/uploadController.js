@@ -6,13 +6,9 @@ import jwtProtection from '../middleware/jwtProtection.js';
 import csrfProtection from '../middleware/csrfProtection.js';
 import imageProtection from '../middleware/imageProtection.js';
 
-const fileFilter = (req, file, cb) => {
-    const match = file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/);
-    cb(null, !!match);
-}
 
 const storage = multer.memoryStorage()
-const upload = multer({ dest: 'uploads/', fileFilter, storage })
+const upload = multer({ dest: 'uploads/', storage })
 const service = new UploadService({ path: 'uploads/' });
 const router = express.Router()
 const putMiddleware = [jwtProtection, csrfProtection.originProtection, csrfProtection.tokenProtection, imageProtection.putProtection]

@@ -1,6 +1,8 @@
 import csrf from '../config/csrf.js';
+import CsrfAuthentication from '../models/csrfAuthentication.js';
 
 const debugMode = process.env.DEBUG;
+const csrfAuthenticationModel = new CsrfAuthentication();
 
 function originProtection(req, res, next) {
     const origin = req.headers.origin;
@@ -19,14 +21,21 @@ function originProtection(req, res, next) {
     next();
 }
 
-function tokenProtection(req, res, next) {
+async function tokenProtection(req, res, next) {
     const token = req.headers['x-csrf-token'];
     if (!token) {
         if (debugMode) console.error('CSRF token not found');
         return res.status(403).send('Access denied');
     }
 
-    const secret = req.user.csrfSecret;
+    const userId = req.user.sub;
+    const csrfAuthentication = await csrfAuthenticationModel.findByUserIdAndCsrfToken(userId, token);
+    if (!csrfAuthentication) {
+        if (debugMode) console.error('CSRF token not found');
+        return res.status(403).send('Access denied');
+    }
+
+    const secret = csrfAuthentication.csrfSecret;
     if (!secret) {
         if (debugMode) console.error('CSRF secret not found');
         return res.status(403).send('Access denied');

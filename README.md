@@ -1,3 +1,4 @@
+[![Deploy to production](https://github.com/niiicolai/questionbook-backend/actions/workflows/deploy.yml/badge.svg)](https://github.com/niiicolai/questionbook-backend/actions/workflows/deploy.yml)
 
 ## Install
 1. Install dependencies

@@ -151,19 +151,41 @@ export default class Model {
      * @description Find a record by primary key
      * @param {Number} pk The primary key
      * @param {Object} where The where clause
+     * @param {Array} leftJoin The left join clause
      * @returns {Object} The record
      * @throws {BadArgumentError} Primary key is required
      * @throws {NotFoundError} Record not found
      * @async
      */
-    async find(pk, where = null) {
+    async find(pk, where = null, leftJoin = null) {
         if (!pk) {
             throw new BadArgumentError('Primary key is required');
         }
 
         const tableName = this.tableName();
         const pkName = this.primaryKeyName();
-        const query = `SELECT * FROM ${tableName} WHERE ${pkName} = ?`;
+        
+        let selectColumns = '';
+        selectColumns = Object.keys(this.columns()).map(column => {
+            return `${tableName}.${column}`;
+        }).join(', ');
+        if (leftJoin) {
+            for (const join of leftJoin) {
+                const table = join.table;
+                const as = join.as;
+                const cols = join.columns.map(column => {
+                    return `${table}.${column} as ${as}_${column}`;
+                }).join(', ');
+                selectColumns += `, ${cols}`;
+            }
+        }
+        let query = `SELECT ${selectColumns} FROM ${tableName}`;
+        if (leftJoin) {
+            for (const join of leftJoin) {
+                query += ` LEFT JOIN ${join.table} ON ${join.on}`;
+            }
+        }
+        query += ` WHERE ${tableName}.${pkName} = ?`;
         if (where) {
             const whereKeys = Object.keys(where);
             const whereQuery = whereKeys.map(key => {
@@ -212,13 +234,29 @@ export default class Model {
     /**
      * @function findAll
      * @description Find all records
+     * @param {Object} options The options
      * @returns {Object} The records
      * @async
      */
-    async findAll() {
+    async findAll({where=null}) {
         const tableName = this.tableName();
-        const selectQuery = `SELECT * FROM ${tableName}`;
-        const countQuery = `SELECT COUNT(*) as count FROM ${tableName}`;
+        let selectQuery = `SELECT * FROM ${tableName}`;
+        let countQuery = `SELECT COUNT(*) as count FROM ${tableName}`;
+        if (where) {
+            const whereKeys = Object.keys(where);
+            const whereQuery = whereKeys.map(key => {
+                if (Array.isArray(where[key])) {
+                    return `${key} IN (${where[key].map(() => '?').join(',')})`;
+                }
+
+                return `${key} = ?`;
+            }).join(' AND ');
+            selectQuery += ` WHERE ${whereQuery}`;
+            countQuery += ` WHERE ${whereQuery}`;
+            const values = Object.values(where);
+            selectParams.push(...values);
+            countParams.push(...values);
+        }
         if (debugMode) {
             console.log(selectQuery);
             console.log(countQuery);
@@ -296,6 +334,10 @@ export default class Model {
         if (where) {
             const whereKeys = Object.keys(where);
             const whereQuery = whereKeys.map(key => {
+                if (Array.isArray(where[key])) {
+                    return `${key} IN (${where[key].map(() => '?').join(',')})`;
+                }
+
                 return `${key} = ?`;
             }).join(' AND ');
             selectQuery += ` WHERE ${whereQuery}`;
@@ -311,8 +353,8 @@ export default class Model {
             console.log(selectQuery, selectParams);
             console.log(countQuery, countParams);
         }
-        const [rows] = await this.db.query(selectQuery, selectParams);
-        const _count = await this.db.query(countQuery, countParams);
+        const [rows] = await this.db.query(selectQuery, selectParams.flatMap(value => value));
+        const _count = await this.db.query(countQuery, countParams.flatMap(value => value));
         const count = _count[0][0].count;
         const pages = Math.ceil(count / limit);
         return { rows, pages, count }
@@ -368,6 +410,11 @@ export default class Model {
         })
         const values = Object.keys(columns).map(key => {
             if (key === 'updatedAt') return new Date();
+            if (columns[key].type === 'BOOLEAN') {
+                return typeof data[key] === 'boolean' 
+                    ? data[key] 
+                    : entity[key];
+            }
             return data[key] || entity[key];
         })
 

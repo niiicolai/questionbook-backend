@@ -16,8 +16,8 @@ export default class EntityService {
      * @returns {Object} Entity
      * @async
      */
-    async find(pk, where=null) {
-        const record = await this.entity.find(pk, where);
+    async find(pk, where=null, leftJoin=null) {
+        const record = await this.entity.find(pk, where, leftJoin);
         return this.dto(record)
     }
 

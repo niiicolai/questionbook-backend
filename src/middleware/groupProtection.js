@@ -1,40 +1,27 @@
-import GroupUser from '../models/groupUser.js';
-import Role from '../models/role.js';
-import RolePermission from '../models/rolePermission.js';
+import PermissionService from '../services/permissionService.js';
+
+const permissionService = new PermissionService();
 
 export default function groupProtection(requiredPermissionNames=[]) {
     return async (req, res, next) => {
         const { sub: userId } = req.user;
         const { id: groupId } = req.params;
 
-        const groupUser = await new GroupUser().findByGroupIdAndUserId(groupId, userId);
-        if (!groupUser) {
+        if (!groupId) {
+            res.status(400).json('Bad Request');
+            return;
+        }
+
+        /**
+         * Check if the user has the required permissions.
+         * It is possible to have the permissions in the group or globally.
+         */
+        const havePermissions = await permissionService
+            .haveGroupOrGlobalPermissions(userId, groupId, requiredPermissionNames);
+
+        if (!havePermissions) {
             res.status(403).json('Forbidden');
             return;
-        }
-
-        const role = await new Role().find(groupUser.roleName);
-        if (!role) {
-            res.status(500).json('Internal Server Error');
-            return;
-        }
-
-        const rolePermissions = await new RolePermission().findAllByRoleName(role.name);
-        if (!rolePermissions) {
-            res.status(500).json('Internal Server Error');
-            return;
-        }
-
-        const permissionNames = rolePermissions.map(rolePermission => rolePermission.permissionName);
-        req.permissions = permissionNames;
-        
-        if (requiredPermissionNames.length > 0) {
-            for (const requiredPermissionName of requiredPermissionNames) {
-                if (!permissionNames.includes(requiredPermissionName)) {
-                    res.status(403).json('Forbidden');
-                    return;
-                }
-            }
         }
 
         next();

@@ -9,6 +9,7 @@ import Role from '../models/role.js';
 import RolePermission from '../models/rolePermission.js';
 import Permission from '../models/permission.js';
 import GroupUser from '../models/groupUser.js';
+import CsrfSecrets from '../models/csrfAuthentication.js';
 
 const userModel = new User();
 const groupModel = new Group();
@@ -19,6 +20,7 @@ const roleModel = new Role();
 const rolePermissionModel = new RolePermission();
 const permissionModel = new Permission();
 const groupUserModel = new GroupUser();
+const csrfSecretsModel = new CsrfSecrets();
 
 const up = async () => {
     await roleModel.createTable();
@@ -31,6 +33,7 @@ const up = async () => {
     await answerModel.createTable();
     await commentModel.createTable();
     await groupUserModel.createTable();
+    await csrfSecretsModel.createTable();
     
     console.log('Migration complete');
 }
@@ -46,6 +49,7 @@ const down = async () => {
     await answerModel.dropTable();
     await commentModel.dropTable();
     await groupUserModel.dropTable();
+    await csrfSecretsModel.dropTable();
 
     console.log('Rollback complete');
 }

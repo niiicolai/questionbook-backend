@@ -4,12 +4,12 @@ const debugMode = process.env.DEBUG;
 
 export default function jwtProtection(req, res, next) {
     const header = req.header('Authorization');
-    if (!header) {
+    if (header===null || !header===undefined) {
         return res.status(401).send('Access denied');
     }
 
     const token = header.split(' ')[1];
-    if (!token) {
+    if (token === 'null' || token === 'undefined') {
         return res.status(401).send('Access denied');
     }
 

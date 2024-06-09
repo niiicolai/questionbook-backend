@@ -4,20 +4,13 @@ import AuthService from '../services/authService.js';
 
 const router = express.Router()
 const service = new AuthService();
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN;
-
-const csrfCookieOptions = { 
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-};
 
 router.route('/api/v1/auth')
     .post(async (req, res) => {
         try {
             const { email, password } = req.body;
-            const { accessToken, csrfToken } = await service.login(email, password);
+            const { accessToken } = await service.login(email, password);
 
-            res.cookie('csrfToken', csrfToken, csrfCookieOptions);
             res.send({ accessToken });
         } catch (error) { 
             if (error instanceof APIError) {
