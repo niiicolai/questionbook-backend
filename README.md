@@ -17,6 +17,10 @@ npm run db:migrate
 ```bash
 npm run db:seed
 ```
+5. Add upload directory
+```bash
+mkdir uploads
+```
 
 ## Run
 ```bash
